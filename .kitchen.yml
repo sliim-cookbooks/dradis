@@ -1,0 +1,19 @@
+---
+driver:
+  name: docker
+  binary: docker
+  use_sudo: false
+
+provisioner:
+  name: chef_zero
+
+platforms:
+  - name: debian-8
+    run_list:
+      - recipe[git]
+suites:
+  - name: dradis
+    run_list:
+      - recipe[dradis]
+    attributes:
+      dradis:
