@@ -25,7 +25,7 @@ end
  'dradis-qualys',
  'dradis-plugins',
  'dradis-projects'].each do |p|
-  describe file "/opt/dradis-ce/#{p}" do
+  describe file "/opt/dradis-ce/plugins/#{p}" do
     it { should be_directory }
     it { should be_mode 755 }
   end

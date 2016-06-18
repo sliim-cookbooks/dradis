@@ -21,8 +21,9 @@ git node['dradis']['install_path'] do
   reference node['dradis']['git_reference']
 end
 
+directory "#{node['dradis']['install_path']}/plugins"
 node['dradis']['addons'].each do |addon, url|
-  git "#{node['dradis']['install_path']}/#{addon}" do
+  git "#{node['dradis']['install_path']}/plugins/#{addon}" do
     repository url
     reference 'master'
   end
