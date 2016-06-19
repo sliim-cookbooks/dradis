@@ -29,10 +29,6 @@ node['dradis']['addons'].each do |addon, url|
   end
 end
 
-gem_package 'bundler' do
-  gem_binary '/opt/chef/embedded/bin/gem'
-end
-
 template "#{node['dradis']['install_path']}/Gemfile.plugins" do
   mode '0644'
   source 'Gemfile.plugins.erb'
@@ -43,6 +39,7 @@ db_name = node['dradis']['databag']['name']
 db_item = node['dradis']['databag']['database_item']
 s_item = node['dradis']['databag']['secrets_item']
 
+# rubocop:disable Style/MultilineTernaryOperator
 database = node['dradis']['database']['use_db'] ?
              data_bag_item(db_name, db_item) :
              node['dradis']['database']

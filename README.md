@@ -7,6 +7,7 @@ Installs and configures [Dradis](http://dradisframework.org) - A Collaboration a
 Requirements
 ------------
 #### Packages
+- `ruby`
 - `git`
 
 #### Platforms
@@ -17,15 +18,24 @@ Attributes
 ----------
 #### dradis::default
 
-|  Key                        |  Type   |  Description                                                           |
-| --------------------------- | ------- | ---------------------------------------------------------------------- |
-| `[dradis][][]`       | Array   |  (default: ``)             |
-
+|  Key                               |  Type   |  Description                                                                |
+| ---------------------------------- | ------- | --------------------------------------------------------------------------- |
+| `[dradis][git_repository]`         | String  | Dradis Git repository (default: `https://github.com/dradis/dradis-ce.git`)  |
+| `[dradis][git_reference]`          | String  | Dradis Git reference to use (default: `master`)                             |
+| `[dradis][install_path]`           | String  | Installation directory (default: `/opt/dradis-ce`)                          |
+| `[dradis][addons]`                 | Hash    | List of Dradis addons to clone.                                             |
+| `[dradis][plugins]`                | Array   | List of plugins to enable (default: `[]`)                                   |
+| `[dradis][database][use_db]`       | Boolean | Use data bag instead of attributes for `database` config (default: `false`) |
+| `[dradis][database][config]`       | Hash    | `database` configuration attributes (default: `{}`)                         |
+| `[dradis][secrets][use_db]`        | Boolean | Use data bag instead of attributes for `secrets` config (default: `false`)  |
+| `[dradis][secrets][config]`        | Hash    | `secrets` configuration attributes (default: `{}`)                          |
+| `[dradis][databag][name]`          | String  | Data bag name (default: `dradis`)                                           |
+| `[dradis][databag][database_item]` | String  | Data bag item for database configuration (default: `database`)              |
+| `[dradis][databag][secrets_item]`  | String  | Data bag item for secrets configuration (default: `secrets`)                |
 
 Usage
 -----
-#### dradis::default
-Include `dradis` in your node's `run_list` to install dradis and its requirements:
+Include `dradis` in your node's `run_list` to install ad configure Dradis and its requirements:
 
 ```json
 {
@@ -35,7 +45,110 @@ Include `dradis` in your node's `run_list` to install dradis and its requirement
   ],
   "attributes": {
     "dradis": {
-      
+      "database": {
+        "config": {
+          "development": {
+            "adapter": "sqlite3",
+            "database": "db/development.sqlite3",
+            "pool": 5,
+            "timeout": 5000
+          },
+          "test": {
+            "adapter": "sqlite3",
+            "database": "db/test.sqlite3",
+            "pool": 5,
+            "timeout": 5000
+          },
+          "production": {
+            "adapter": "sqlite3",
+            "database": "db/production.sqlite3",
+            "pool": 5,
+            "timeout": 5000
+          }
+        }
+      },
+      "secrets": {
+        "config": {
+          "development": {
+            "secret_key_base": "my-dev-secret-key"
+          },
+          "test": {
+            "secret_key_base": "my-test-secret-key"
+          },
+          "production": {
+            "secret_key_base": "my-prod-secret-key"
+          }
+        }  
+      }
+    }
+  }
+}
+```
+
+Dradis can be configured from attributes or data bags. To use data bags, you need to create a data bag `dradis` with items `database`, `secrets`, these values can be configured from attributes `node[dradis][databag][name]`, `node[dradis][databag][database_item]` and `node[dradis][databag][secrets_item]`.
+
+Once created, set attributes `node[dradis][database][use_db]` and `node[dradis][secrets][use_db]` to true on your node and you are ready to configure Dradis from data bags.
+
+```json
+{
+  "name":"my_node",
+  "run_list": [
+    "recipe[dradis]"
+  ],
+  "attributes": {
+    "dradis": {
+      "database": {
+        "use_db": true
+      },
+      "secrets": {
+        "use_db": true
+      }
+    }
+  }
+}
+```
+
+#### Example data bags:
+- `dradis/database.json`
+```
+{
+  "id": "database",
+  "config": {
+    "development": {
+      "adapter": "sqlite3",
+      "database": "db/development.sqlite3",
+      "pool": 5,
+      "timeout": 5000
+    },
+    "test": {
+      "adapter": "sqlite3",
+      "database": "db/test.sqlite3",
+      "pool": 5,
+      "timeout": 5000
+    },
+    "production": {
+      "adapter": "sqlite3",
+      "database": "db/production.sqlite3",
+      "pool": 5,
+      "timeout": 5000
+    }
+  }
+}
+```
+
+- `dradis/secrets.json`
+```
+{
+  "id": "secrets",
+  "config": {
+    "development": {
+      "secret_key_base": "my-dev-secret-key"
+    },
+    "test": {
+      "secret_key_base": "my-test-secret-key"
+    },
+    "production": {
+      "secret_key_base": "my-prod-secret-key"
     }
   }
 }

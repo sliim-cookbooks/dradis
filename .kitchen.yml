@@ -6,14 +6,57 @@ driver:
 
 provisioner:
   name: chef_zero
+  data_bags_path: test/integration/data_bags
 
 platforms:
   - name: debian-8
     run_list:
       - recipe[git]
 suites:
-  - name: dradis
+  - name: databags
     run_list:
       - recipe[dradis]
     attributes:
       dradis:
+        plugins:
+          - dradis-metasploit
+          - dradis-nmap
+        database:
+          use_db: true
+        secrets:
+          use_db: true
+  - name: attributes
+    run_list:
+      - recipe[dradis]
+    attributes:
+      dradis:
+        plugins:
+          - dradis-metasploit
+          - dradis-nmap
+        database:
+          use_db: false
+          config:
+            development:
+              adapter: sqlite3
+              database: db/development.sqlite3
+              pool: 5
+              timeout: 5000
+            test:
+              adapter: sqlite3
+              database: db/test.sqlite3
+              pool: 5
+              timeout: 5000
+            production:
+              adapter: sqlite3
+              database: db/production.sqlite3
+              pool: 5
+              timeout: 5000
+        secrets:
+          use_db: false
+          config:
+            development:
+              secret_key_base: my-dev-secret-key
+            test:
+              secret_key_base: my-test-secret-key
+            production:
+              secret_key_base: my-prod-secret-key

@@ -9,6 +9,8 @@ AllCops:
     - recipes/**/*
     - resources/**/*
     - test/**/*
+  Exclude:
+    - test/integration/data_bags/**/*
 
 LineLength:
   Exclude:
